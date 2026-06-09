@@ -1,0 +1,30 @@
+{
+  "name": "grm-whatsapp-bot",
+  "version": "1.0.0",
+  "description": "Grievance Redress Management system using Twilio WhatsApp API",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "grievance",
+    "redress",
+    "twilio",
+    "kenya"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "twilio": "^4.10.0",
+    "dotenv": "^16.3.1",
+    "better-sqlite3": "^9.2.2"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

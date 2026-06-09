@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRM Dashboard - Grievance Redress System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin-bottom: 5px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .grievances-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .grievances-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f9f9f9;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status.open {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.in_progress {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status.resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.closed {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .refresh-btn:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Grievance Redress System</h1>
+        <p>WhatsApp-based Complaint Management Dashboard</p>
+    </header>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Grievances</h3>
+                <div class="number" id="totalGrievances">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Open</h3>
+                <div class="number" id="openGrievances">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>In Progress</h3>
+                <div class="number" id="inProgressGrievances">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Resolved</h3>
+                <div class="number" id="resolvedGrievances">-</div>
+            </div>
+        </div>
+
+        <div class="grievances-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2>Recent Grievances</h2>
+                <button class="refresh-btn" onclick="loadGrievances()">Refresh</button>
+            </div>
+            <div id="grievancesContainer" class="loading">Loading grievances...</div>
+        </div>
+    </div>
+
+    <script>
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+
+                document.getElementById('totalGrievances').textContent = data.totalGrievances;
+                document.getElementById('openGrievances').textContent = data.openGrievances;
+                document.getElementById('inProgressGrievances').textContent = data.inProgressGrievances;
+                document.getElementById('resolvedGrievances').textContent = data.resolvedGrievances;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load grievances
+        async function loadGrievances() {
+            try {
+                const response = await fetch('/api/grievances');
+                const grievances = await response.json();
+
+                if (grievances.length === 0) {
+                    document.getElementById('grievancesContainer').innerHTML = '<p style="text-align: center; color: #999;">No grievances yet</p>';
+                    return;
+                }
+
+                let html = '<table><thead><tr><th>Ref No</th><th>Category</th><th>Status</th><th>Phone</th><th>Submitted</th></tr></thead><tbody>';
+
+                grievances.forEach(g => {
+                    const date = new Date(g.created_at).toLocaleDateString();
+                    html += `
+                        <tr>
+                            <td><strong>${g.ref_no}</strong></td>
+                            <td>${g.category}</td>
+                            <td><span class="status ${g.status}">${g.status.toUpperCase()}</span></td>
+                            <td>${g.phone}</td>
+                            <td>${date}</td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                document.getElementById('grievancesContainer').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading grievances:', error);
+                document.getElementById('grievancesContainer').innerHTML = '<div class="error">Error loading grievances</div>';
+            }
+        }
+
+        // Initial load
+        loadStats();
+        loadGrievances();
+
+        // Refresh every 30 seconds
+        setInterval(() => {
+            loadStats();
+            loadGrievances();
+        }, 30000);
+    </script>
+</body>
+</html>
