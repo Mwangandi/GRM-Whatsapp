@@ -1,0 +1,25 @@
+[Unit]
+Description=GRM WhatsApp Grievance Management System
+After=network.target
+
+[Service]
+Type=simple
+User=frappe
+WorkingDirectory=/home/frappe/GRM/GRM-Whatsapp
+ExecStart=/usr/bin/node index.js
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/grm-whatsapp/grm-whatsapp.log
+StandardError=append:/var/log/grm-whatsapp/grm-whatsapp-error.log
+
+# Environment variables
+Environment="PORT=8090"
+Environment="NODE_ENV=production"
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
