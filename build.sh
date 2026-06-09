@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 # Configuration
 PROJECT_NAME="GRM-WhatsApp"
 SERVICE_NAME="grm-whatsapp"
-PORT=${PORT:-8090}
+PORT=${PORT:-8091}
 NODE_ENV=${NODE_ENV:-production}
 LOG_DIR="./logs"
 PID_FILE="$LOG_DIR/${SERVICE_NAME}.pid"
